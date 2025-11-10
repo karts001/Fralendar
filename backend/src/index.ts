@@ -7,7 +7,7 @@ import { authRoutes } from './routes/auth.routes';
 const app: FastifyInstance = Fastify({logger: true});
 
 app.register(cors, { origin: true });
-// app.register(prismaPlugin);
+app.register(prismaPlugin);
 app.register(authPlugin);
 
 app.register(authRoutes, { prefix: '/auth' });

@@ -13,3 +13,49 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id          String           @id @default(cuid())
+  email       String           @unique
+  displayName String?
+  role        String           @default("user")
+  memberships CalendarMember[]
+
+  adminCalendars Calendar[] @relation("AdminCalendars")
+  events         Event[]
+}
+
+model Calendar {
+  id        String           @id @default(cuid())
+  name      String
+  events    Event[]
+  members   CalendarMember[]
+  admin     User             @relation("AdminCalendars", fields: [adminId], references: [id])
+  adminId   String
+  createdAt DateTime         @default(now())
+}
+
+model CalendarMember {
+  id         String   @id @default(cuid())
+  calendar   Calendar @relation(fields: [calendarId], references: [id])
+  calendarId String
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  event      Event?   @relation(fields: [eventId], references: [id])
+  eventId    String?
+
+  @@unique([calendarId, userId])
+}
+
+model Event {
+  id          String           @id @default(cuid())
+  calendar    Calendar         @relation(fields: [calendarId], references: [id])
+  calendarId  String
+  title       String
+  description String?
+  attendees   CalendarMember[]
+  startTime   DateTime
+  endTime     DateTime
+  createdBy   User             @relation(fields: [createdById], references: [id])
+  createdById String
+}
