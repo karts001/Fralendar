@@ -1,6 +1,9 @@
 import { FastifyInstance } from "fastify";
 
+import { AuthService } from "../services/authService";
+
 export const authRoutes = async (fastify: FastifyInstance) => {
+  const authService = new AuthService(fastify.prisma);
   fastify.get(
     "/test-protected", 
     { onRequest: [fastify.authenticate] },
@@ -20,19 +23,7 @@ export const authRoutes = async (fastify: FastifyInstance) => {
     { onRequest: [fastify.authenticate] },
     async (request, reply) => {
       const { sub: userId, email } = request.user;
-
-      let user = await fastify.prisma.user.findUnique({
-        where: { id: userId }
-      });
-
-      if (!user) {
-        user = await fastify.prisma.user.create({
-          data: {
-            id: userId,
-            email: email,
-          }
-        });
-      }
+      const user = await authService.syncUser(userId, email);
 
       return reply.send({
         message: "User synced",
