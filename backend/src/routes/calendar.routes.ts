@@ -19,6 +19,20 @@ export const calendarRoutes = async (fastify: FastifyInstance) => {
     }
   ),
 
+  fastify.get(
+    '/:calendarId',
+    { onRequest: [fastify.authenticate] },
+    async (request, reply) => {
+      const { calendarId } = request.params as { calendarId: string};
+      const calendarDetails = await calendarService.getCalendarDetails(calendarId);
+
+      return reply.status(200).send({
+        calendarDetails: calendarDetails,
+        message: `Retreived calendar details with ID: ${calendarId}`
+      })
+    }
+  )
+
   fastify.post(
     '/create',
     { onRequest: [fastify.authenticate] },
@@ -26,7 +40,12 @@ export const calendarRoutes = async (fastify: FastifyInstance) => {
       const { name } = request.body as { name: string };
       const userId = request.user.sub;
 
-      return await calendarService.createCalendar(userId, name);
+      const newCalendar = await calendarService.createCalendar(userId, name);
+
+      return reply.status(200).send({
+        calendar: newCalendar,
+        message: `Created new calendar with name: ${newCalendar.name}`
+      });
     }
   ),
   
@@ -47,7 +66,6 @@ export const calendarRoutes = async (fastify: FastifyInstance) => {
         console.error('Error deleting calendar:', error);
         return reply.status(500).send({ 
             message: 'Failed to delete calendar',
-
           }
         );
       }

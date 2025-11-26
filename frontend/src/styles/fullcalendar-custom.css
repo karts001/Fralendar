@@ -1,0 +1,264 @@
+@import 'tailwindcss';
+
+/* Base calendar styles */
+.fc {
+  @apply font-sans;
+}
+
+/* Header toolbar */
+.fc .fc-toolbar {
+  @apply mb-4 flex-wrap gap-2;
+}
+
+.fc .fc-toolbar-title {
+  @apply text-2xl font-bold text-gray-900;
+}
+
+.fc .fc-toolbar-chunk {
+  @apply flex items-center gap-2;
+}
+
+/* Buttons */
+.fc .fc-button {
+  @apply bg-indigo-600 text-white border-indigo-600 rounded-lg px-4 py-2 font-medium transition-colors shadow-sm;
+}
+
+.fc .fc-button:hover {
+  @apply bg-indigo-700 border-indigo-700;
+}
+
+.fc .fc-button:focus {
+  @apply ring-2 ring-indigo-500 ring-offset-2 outline-none;
+}
+
+.fc .fc-button:disabled {
+  @apply bg-gray-300 border-gray-300 cursor-not-allowed opacity-50;
+}
+
+.fc .fc-button-active {
+  @apply bg-indigo-800 border-indigo-800;
+}
+
+/* Today button special styling */
+.fc .fc-today-button {
+  @apply bg-white text-indigo-600 border-indigo-600 hover:bg-indigo-50;
+}
+
+/* Button group */
+.fc .fc-button-group {
+  @apply shadow-sm;
+}
+
+.fc .fc-button-group > .fc-button {
+  @apply rounded-none;
+}
+
+.fc .fc-button-group > .fc-button:first-child {
+  @apply rounded-l-lg;
+}
+
+.fc .fc-button-group > .fc-button:last-child {
+  @apply rounded-r-lg;
+}
+
+/* Calendar grid */
+.fc .fc-scrollgrid {
+  @apply border-gray-200 rounded-lg overflow-hidden;
+}
+
+.fc .fc-scrollgrid td,
+.fc .fc-scrollgrid th {
+  @apply border-gray-200;
+}
+
+/* Column headers (day names) */
+.fc .fc-col-header-cell {
+  @apply bg-gray-50 font-semibold text-gray-700 py-3 text-sm uppercase tracking-wide;
+}
+
+.fc .fc-col-header-cell-cushion {
+  @apply text-gray-700;
+}
+
+/* Day cells */
+.fc .fc-daygrid-day {
+  @apply hover:bg-gray-50 cursor-pointer transition-colors;
+}
+
+.fc .fc-daygrid-day-frame {
+  @apply min-h-[100px];
+}
+
+.fc .fc-daygrid-day-top {
+  @apply flex justify-center items-center;
+}
+
+.fc .fc-daygrid-day-number {
+  @apply text-gray-700 p-2 font-medium;
+}
+
+/* Today highlight */
+.fc .fc-day-today {
+  @apply bg-indigo-50;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+  @apply text-indigo-600 font-bold bg-indigo-100 rounded-full w-8 h-8 flex items-center justify-center;
+}
+
+/* Weekend styling (optional) */
+.fc .fc-day-sat,
+.fc .fc-day-sun {
+  @apply bg-gray-50;
+}
+
+/* Events */
+.fc-event {
+  @apply bg-indigo-600 border-indigo-700 cursor-pointer rounded shadow-sm;
+}
+
+.fc-event:hover {
+  @apply bg-indigo-700 border-indigo-800 shadow-md;
+}
+
+.fc-event-title {
+  @apply font-medium text-white;
+}
+
+.fc-event-time {
+  @apply text-white opacity-90;
+}
+
+/* Dragging events */
+.fc-event-dragging {
+  @apply opacity-75;
+}
+
+/* Event dot (for list view) */
+.fc .fc-daygrid-event-dot {
+  @apply bg-indigo-600 border-indigo-600;
+}
+
+/* More link (when too many events) */
+.fc .fc-daygrid-more-link {
+  @apply text-indigo-600 hover:text-indigo-700 font-medium hover:underline;
+}
+
+/* Popover for "more" events */
+.fc .fc-popover {
+  @apply bg-white shadow-xl border border-gray-200 rounded-lg;
+}
+
+.fc .fc-popover-header {
+  @apply bg-gray-50 font-semibold text-gray-900 px-4 py-3 border-b border-gray-200;
+}
+
+.fc .fc-popover-body {
+  @apply p-2;
+}
+
+/* Remove default blue color from links */
+.fc a {
+  @apply text-current no-underline;
+}
+
+.fc a:hover {
+  @apply text-current;
+}
+
+/* Time grid (week/day view) */
+.fc .fc-timegrid-slot {
+  @apply border-gray-200;
+}
+
+.fc .fc-timegrid-slot-label {
+  @apply text-gray-600 text-sm px-2;
+}
+
+.fc .fc-timegrid-slot-lane {
+  @apply hover:bg-gray-50 transition-colors;
+}
+
+/* Current time indicator */
+.fc .fc-timegrid-now-indicator-line {
+  @apply border-red-500;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  @apply border-red-500;
+}
+
+/* Time grid events */
+.fc-timegrid-event {
+  @apply rounded shadow-sm;
+}
+
+.fc-timegrid-event .fc-event-main {
+  @apply p-1;
+}
+
+/* Scrollbar styling */
+.fc-scroller {
+  @apply overflow-auto;
+}
+
+.fc-scroller::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+.fc-scroller::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded hover:bg-gray-400;
+}
+
+/* Loading state */
+.fc .fc-view-harness-loading {
+  @apply opacity-50;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fc .fc-toolbar {
+    @apply flex-col items-stretch;
+  }
+  
+  .fc .fc-toolbar-chunk {
+    @apply justify-center my-1;
+  }
+  
+  .fc .fc-toolbar-title {
+    @apply text-xl text-center;
+  }
+  
+  .fc .fc-button {
+    @apply text-sm px-3 py-1;
+  }
+  
+  .fc .fc-daygrid-day-number {
+    @apply text-sm p-1;
+  }
+}
+
+/* Custom event colors (can be controlled via event properties) */
+.fc-event.event-primary {
+  @apply bg-indigo-600 border-indigo-700;
+}
+
+.fc-event.event-success {
+  @apply bg-green-600 border-green-700;
+}
+
+.fc-event.event-warning {
+  @apply bg-yellow-500 border-yellow-600;
+}
+
+.fc-event.event-danger {
+  @apply bg-red-600 border-red-700;
+}
+
+.fc-event.event-info {
+  @apply bg-blue-600 border-blue-700;
+}

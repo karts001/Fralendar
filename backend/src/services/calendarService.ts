@@ -29,7 +29,7 @@ export class CalendarService {
       orderBy: { createdAt: 'desc' }
     });
 
-    // transform the resposne to match the frontend
+    // transform the response to match the frontend
     return calendars.map(calendar => ({
       id: calendar.id,
       name: calendar.name,
@@ -39,6 +39,14 @@ export class CalendarService {
       memberCount: calendar._count.members,
       eventCount: calendar._count.events     
     }));
+  }
+
+  async getCalendarDetails(calendarId: string) {
+    const calendar = await this.prisma.calendar.findFirst({
+      where: { id: calendarId }
+    });
+
+    return calendar;
   }
 
   async createCalendar(userId: string, name: string, description?: string) {

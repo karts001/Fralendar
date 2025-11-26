@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import { supabase } from './lib/supabaseClient';
+import { CalendarView } from './pages/CalendarView';
 
 function App() {
   const [session, setSession] = useState<any>(null);
@@ -31,6 +32,7 @@ function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Home />} />
+      <Route path='/calendar/:calendarId' element={<CalendarView />} />
     </Routes>
     </BrowserRouter>
   )

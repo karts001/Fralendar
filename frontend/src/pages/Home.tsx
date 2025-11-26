@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Loader2, Plus} from "lucide-react";
+import { Loader2} from "lucide-react";
 
 import { useCalendars } from "../hooks/useCalendars";
 import { authService } from "../services/authService";
@@ -8,6 +8,7 @@ import { DashboardHeader } from "../components/dashboard/DashboardHeader";
 import { PageHeader } from "../components/dashboard/PageHeader";
 import { CalendarGrid } from "../components/dashboard/CalendarGrid";
 import { CreateCalendarModal } from "../components/dashboard/CreateCalendarModal";
+import { ErrorAlert } from "../components/common/ErrorAlert";
 import type { CreateCalendarDTO } from "../types/calendar";
 
 
@@ -41,39 +42,18 @@ export default function Home() {
     navigate('/login');
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Dashboard Header */}
       <DashboardHeader user={user} onLogout={handleLogout} />
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
         <PageHeader onCreateClick={() => setShowCreateModal(true)} />
-
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
-            {error}
-          </div>
-        )}
-
-        {/* Calendars Grid */}
+        { error && (<ErrorAlert message={error} />) }
         <CalendarGrid
           calendars={calendars}
           onCalendarClick={(calendarId) => navigate(`/calendar/${calendarId}`)}
           onCreateClick={() => setShowCreateModal(true)}
         />
       </main>
-
-      {/* Create Calendar Modal */}
       {showCreateModal && (
         <CreateCalendarModal
           isOpen={showCreateModal}
