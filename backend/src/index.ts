@@ -6,8 +6,12 @@ import prismaPlugin from './plugins/prisma';
 import authPlugin from './plugins/auth';
 import { authRoutes } from './routes/auth.routes';
 import { calendarRoutes } from './routes/calendar.routes';
+import { eventRoutes } from './routes/event.routes';
 
-const app: FastifyInstance = Fastify({logger: true});
+const app: FastifyInstance = Fastify({
+  logger: {
+    level: 'debug'
+  }});
 
 app.register(cors, { origin: true });
 app.register(prismaPlugin);
@@ -15,6 +19,7 @@ app.register(authPlugin);
 
 app.register(authRoutes, { prefix: '/auth' });
 app.register(calendarRoutes, { prefix: '/calendars' });
+app.register(eventRoutes, { prefix: '/event' });
 
 
 app.listen({ port: 4000 }, (err, address) => {
