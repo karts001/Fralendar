@@ -44,8 +44,12 @@ export const authService = {
 
   async getAccessToken() {
     const session = await this.getSession();
-    return session?.access_token || null;
+    const token = session?.access_token || null;
+    if (!token) throw new Error('No access token found');
+
+    return token;
   },
+
 
   async syncWithBackend() {
     const token = await this.getAccessToken();

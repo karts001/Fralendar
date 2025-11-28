@@ -18,8 +18,31 @@ const authPlugin: FastifyPluginAsync = fp(async (fastify) => {
   fastify.register(jwt, {
     decode: { complete: true },
     secret: async (request, token) => {
-      const { header: { kid, alg }, payload: { iss } } = token;
-      return getJwks.getPublicKey({ kid, domain: iss, alg: 'ES256' });
+      try {
+        const { header, payload } = token as {
+          header: { kid?: string; alg?: string};
+          payload: { iss?: string }
+        };
+        const { kid, alg} = header;
+        const { iss } = payload;
+
+        if (!kid) throw new Error('Missing kid in token header');
+
+        if (!alg) throw new Error('Missing alg from token header');
+
+        if (!iss) throw new Error('Missing iss in token payload');
+
+        // Get public key from JWKS endpoint
+        const publicKey = await getJwks.getPublicKey({
+          kid,
+          domain: iss,
+          alg: alg || 'ES256'
+        });
+        return publicKey;
+      } catch(error) {
+        fastify.log.error({ error }, 'Failed to resolve JWT secret');
+        throw error;
+      }
     },
   });
   fastify.decorate("authenticate", async function(request, reply) {
