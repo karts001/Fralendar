@@ -1,9 +1,29 @@
 import { PrismaClient } from "@prisma/client";
+import { CalendarDetailsDTO, CalendarDTO } from "../dtos/calendarDTO";
+import { CalendarDetailsMapper, CalendarMapper } from "../mappers/calendarMapper";
 
 export class CalendarService {
   constructor(private prisma: PrismaClient) {}
 
-  async getUserCalendars(userId: string) {
+  async verifyAccessByCalendarId(userId: string, calendarId: string) {
+    const calendar = await this.prisma.calendar.findFirst({
+      where: {
+        id: calendarId,
+        OR: [
+          { adminId: userId },
+          { members: { some: { userId } } }
+        ]
+      }
+    });
+
+    if (!calendar) {
+      throw new Error('User is not a member of this calendar');
+    }
+
+    return calendar;
+  }
+
+  async getUserCalendars(userId: string): Promise<CalendarDTO[]> {
     const calendars = await this.prisma.calendar.findMany({
       where: {
         OR: [
@@ -29,24 +49,26 @@ export class CalendarService {
       orderBy: { createdAt: 'desc' }
     });
 
-    // transform the response to match the frontend
-    return calendars.map(calendar => ({
-      id: calendar.id,
-      name: calendar.name,
-      adminId: calendar.adminId,
-      admin: calendar.admin,
-      createdAt: calendar.createdAt,
-      memberCount: calendar._count.members,
-      eventCount: calendar._count.events     
-    }));
+    // Transform the response to DTO
+    return calendars.map(c => CalendarMapper.toDTO(c));
   }
 
-  async getCalendarDetails(calendarId: string) {
+  async getCalendarEvents(userId: string, calendarId: string) {
+    // First verify member has access to this calendar
+    await this.verifyAccessByCalendarId(userId, calendarId);
+
+    return await this.prisma.event.findMany({
+      where: { calendarId },
+      orderBy: { startTime: 'asc' }
+    });
+  }
+
+  async getCalendarDetails(calendarId: string): Promise<CalendarDetailsDTO> {
     const calendar = await this.prisma.calendar.findFirst({
       where: { id: calendarId }
     });
 
-    return calendar;
+    return CalendarDetailsMapper.toDTO(calendar);
   }
 
   async createCalendar(userId: string, name: string, description?: string) {
