@@ -5,8 +5,6 @@ export const calendarService = {
   async getCalendars(): Promise<CalendarType[]> {
     const token = await authService.getAccessToken();
 
-    if (!token) throw new Error('No access token found');
-
     const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/calendars`, {
       method: 'GET',
       headers: {
@@ -22,8 +20,6 @@ export const calendarService = {
 
   async getCalendarDetails(calendarId: string): Promise<CalendarDetails> {
     const token = await authService.getAccessToken();
-
-    if (!token) throw new Error('No access token found');
 
     const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/calendars/${calendarId}`, {
       method: 'GET',
@@ -42,8 +38,6 @@ export const calendarService = {
 
   async createCalendar(name: string, description?: string): Promise<CalendarType> {
     const token = await authService.getAccessToken();
-
-    if (!token) throw new Error('No access token found');
 
     const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/calendars/create`, {
       method: 'POST',
