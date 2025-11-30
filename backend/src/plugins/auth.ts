@@ -47,6 +47,8 @@ const authPlugin: FastifyPluginAsync = fp(async (fastify) => {
   });
   fastify.decorate("authenticate", async function(request, reply) {
     try {
+      const authHeader = request.headers.authorization;
+      console.log('Auth header received:', authHeader ? authHeader.substring(0, 30) + '...' : 'NO HEADER');
       await request.jwtVerify();
     } catch (err) {
       throw httpErrors.unauthorized("Invalid or missing token");

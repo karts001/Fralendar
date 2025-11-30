@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabaseClient";
+import { AuthError, HttpError } from "../types/errors";
 
 export const authService = {
   async login(email: string, password: string) {
@@ -36,20 +37,52 @@ export const authService = {
   },
 
   async getSession() {
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new AuthError('No active session');
 
-    if (error) throw error;
     return session;
   },
 
   async getAccessToken() {
     const session = await this.getSession();
     const token = session?.access_token || null;
-    if (!token) throw new Error('No access token found');
+    if (!token)  {
+      throw new Error('No access token found');
+    }
 
     return token;
   },
 
+  async authenticatedFetch(url: string, options: RequestInit): Promise<Response> {
+    try {
+      const token = await this.getAccessToken();
+
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          ...options.headers,
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      });
+
+      if (response.status === 401) {
+        await this.logout();
+        throw new AuthError('Unauthorised access');
+      }
+
+      if (!response.ok) {
+        throw new HttpError(`Http error! status ${response.status}`, response.status);
+      }
+
+      return response;
+    } catch(error: any) {
+      if (error.message === 'No active session') {
+        await this.logout();
+        throw new AuthError('No active session');
+      }
+      throw error;
+    }
+  },
 
   async syncWithBackend() {
     const token = await this.getAccessToken();

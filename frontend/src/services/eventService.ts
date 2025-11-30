@@ -4,14 +4,12 @@ import { authService } from "./authService"
 export const eventService = {
   
   async getEvents(calendarId: string): Promise<EventType[]> {
-    const token = await authService.getAccessToken();
-
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/calendars/${calendarId}/events`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
+    const response = await authService.authenticatedFetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/calendars/${calendarId}/events`,
+      {
+        method: 'GET',
       }
-    });
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -24,17 +22,17 @@ export const eventService = {
   },
 
   async createEvent(input: CreateEventDTO): Promise<EventType> {
-    const token = await authService.getAccessToken();
-    console.log('input: ', input);
-
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/event/create`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(input),
-    });
+    const response = await authService.authenticatedFetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/event/create`, 
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(input),
+      }
+    );
+    
 
     if (!response.ok) {
       const errorData = await response.json();

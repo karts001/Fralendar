@@ -5,12 +5,15 @@ export const calendarService = {
   async getCalendars(): Promise<CalendarType[]> {
     const token = await authService.getAccessToken();
 
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/calendars`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
+    const response = await authService.authenticatedFetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/calendars`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       }
-    });
+    );
 
     if (!response.ok) throw new Error('Failed to fetch calendars');
 
@@ -19,14 +22,13 @@ export const calendarService = {
   },
 
   async getCalendarDetails(calendarId: string): Promise<CalendarDetails> {
-    const token = await authService.getAccessToken();
 
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/calendars/${calendarId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
+    const response = await authService.authenticatedFetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/calendars/${calendarId}`,
+      {
+        method: 'GET'
       }
-    });
+    );
 
     if (!response.ok) throw new Error('Failed to fetch calendar details')
 
@@ -37,16 +39,14 @@ export const calendarService = {
   },
 
   async createCalendar(name: string, description?: string): Promise<CalendarType> {
-    const token = await authService.getAccessToken();
 
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/calendars/create`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ name, description })
-    });
+    const response = await authService.authenticatedFetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/calendars/create`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ name, description })
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -58,14 +58,12 @@ export const calendarService = {
   },
 
   async deleteCalendar(id: string): Promise<void> {
-    const token = await authService.getAccessToken();
-
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/calendars/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
+    const response = await authService.authenticatedFetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/calendars/${id}`,
+      {
+        method: 'DELETE'
       }
-    });
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
