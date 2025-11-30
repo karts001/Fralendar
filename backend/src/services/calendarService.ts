@@ -65,7 +65,12 @@ export class CalendarService {
 
   async getCalendarDetails(calendarId: string): Promise<CalendarDetailsDTO> {
     const calendar = await this.prisma.calendar.findFirst({
-      where: { id: calendarId }
+      where: { id: calendarId },
+      include: {
+        _count: {
+          select: { members: true}
+        }
+      }
     });
 
     return CalendarDetailsMapper.toDTO(calendar);

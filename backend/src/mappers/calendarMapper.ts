@@ -21,7 +21,8 @@ export class CalendarDetailsMapper {
       id: calendarDetails.id,
       adminId: calendarDetails.adminId,
       name: calendarDetails.name,
-      createdAt: calendarDetails.createdAt
+      createdAt: calendarDetails.createdAt,
+      memberCount: calendarDetails._count.members
     };
   }
 }

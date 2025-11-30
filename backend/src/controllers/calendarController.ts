@@ -26,6 +26,7 @@ export class CalendarController {
         const userId = request.user.sub;
 
         const events = await this.calendarService.getCalendarEvents(userId, calendarId);
+        console
 
         return reply.status(200).send({
           events: events,
@@ -43,6 +44,8 @@ export class CalendarController {
     async getCalendar(request: FastifyRequest, reply: FastifyReply) {
       const { calendarId } = request.params as { calendarId: string};
       const calendarDetails = await this.calendarService.getCalendarDetails(calendarId);
+
+      console.log('calendar details: ', calendarDetails);
 
       return reply.status(200).send({
         calendarDetails: calendarDetails,

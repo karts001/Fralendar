@@ -32,7 +32,7 @@ export const calendarService = {
 
     const data = await response.json();
 
-    return data;
+    return data.calendarDetails;
 
   },
 
