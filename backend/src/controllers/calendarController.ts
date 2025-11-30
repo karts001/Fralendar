@@ -28,6 +28,7 @@ export class CalendarController {
         const events = await this.calendarService.getCalendarEvents(userId, calendarId);
 
         return reply.status(200).send({
+          events: events,
           eventCount: events.length,
           message: `Retrieved all events for calendar with ID: ${calendarId}`
         });

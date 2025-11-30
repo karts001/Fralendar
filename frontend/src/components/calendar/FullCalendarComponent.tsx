@@ -9,20 +9,39 @@ import '@fullcalendar/core';
 import '@fullcalendar/daygrid';
 import '@fullcalendar/timegrid';
 import '../../styles/fullcalendar-custom.css';
+import type { EventType } from '../../types/event.types';
 
 
 interface FullCalendarComponentProps {
   ref: React.RefObject<any>;
+  events: EventType[];
   onDateClick: (arg: any) => void;
   // onEventClick: (arg: any) => void;
 }
 
-export const FullCalendarComponent: React.FC<FullCalendarComponentProps> = ({onDateClick}) => {
+export const FullCalendarComponent: React.FC<FullCalendarComponentProps> = (
+  {
+    onDateClick,
+    events
+  }) => {
   const calendarRef = useRef<FullCalendar>(null);
   
   const handleDateClick = (arg:any) => {
     onDateClick(arg.dateStr);
   }
+  // Transform EventType into FullCalendar format
+  const fullCalendarEvents = events.map(event => ({
+    id: event.id,
+    title: event.title,
+    start: event.startTime,
+    end: event.endTime,
+    extendedProps: {
+      description: event.description,
+      calendarId: event.calendarId,
+      createdById: event.createdById
+    }
+  }));
+
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
@@ -35,6 +54,7 @@ export const FullCalendarComponent: React.FC<FullCalendarComponentProps> = ({onD
           center: 'title',
           right: 'dayGridMonth,timeGridWeek,timeGridDay'
         }}
+        events={fullCalendarEvents}
         editable={true}
         selectable={true}
         selectMirror={true}

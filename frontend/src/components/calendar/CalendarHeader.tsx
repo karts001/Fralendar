@@ -6,11 +6,13 @@ import { ArrowLeft, Plus } from 'lucide-react';
 interface CalendarHeaderProps {
   calendar: CalendarDetails;
   onBack: () => void;
+  onCreateEvent: () => void;
 }
 
 export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   calendar,
   onBack,
+  onCreateEvent,
 }) => (
   <div className="bg-white shadow-sm border-b">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -31,6 +33,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           </div>
         </div>
         <button
+          onClick={onCreateEvent}
           className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
         >
           <Plus className="w-5 h-5" />

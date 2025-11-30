@@ -71,28 +71,35 @@ export class EventService {
       data: {
         title,
         description,
-        startTime,
-        endTime,
         calendarId,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
         createdById: userId,
         // Automatically add creator as attendee
-        attendee: {
-          userId,
-          calendarId
+        attendees: {
+          create: [
+            {
+              userId: userId,
+            }
+          ]
         }
       },
       include: {
         createdBy: {
-          id: true,
-          email: true,
-          displayName: true,
+          select: {
+            id: true,
+            email: true,
+            displayName: true,
+          }
         },
         attendees: {
           include: {
             user: {
-              id: true,
-              email: true,
-              displayName: true
+              select : {
+                id: true,
+                email: true,
+                displayName: true
+              }
             }
           }
         }

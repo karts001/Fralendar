@@ -3,10 +3,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { CalendarHeader } from '../components/calendar/CalendarHeader'
 import { FullCalendarComponent } from '../components/calendar/FullCalendarComponent';
 import { useCalendarDetails } from '../hooks/useCalendarDetails';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { useCreateEvents } from '../hooks/useCreateEvent';
+import { useCalendarEvents } from '../hooks/useCalendarEvents';
+import type { CreateEventDTO, EventType } from '../types/event.types';
+import { CreateEventModal } from '../components/calendar/CreateEventModal';
 
 export const CalendarView = () => {
   const { calendarId } = useParams<{ calendarId: string }>();
+  
   const calendarRef = useRef(null);
 
   if (!calendarId) {
@@ -18,7 +23,49 @@ export const CalendarView = () => {
   }
   const navigate = useNavigate();
   
-  const { calendar, error, loading, refetch } = useCalendarDetails(calendarId);
+  const { calendar, error: calendarError, loading: calendarLoading  } = useCalendarDetails(calendarId);
+  const { events, loading: eventsLoading, error: eventsError, refetch} = useCalendarEvents(calendarId);
+
+  // Modal states
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEventDetailsModal, setShowEventsDetailsModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>()
+  const [selectedEvent, setSelectedEvent] = useState<EventType | null>(null);
+
+  // Create event hook
+  const { createEvent, isCreating, error: createError } = useCreateEvents(() => {
+    console.log('Event creation error: ', createError);
+    setShowCreateModal(false);
+    refetch(); // Refresh events after creation
+  });
+
+  // Loading state
+  const loading = calendarLoading || eventsLoading;
+  // const error = calendarError || eventsError;
+
+  // Handlers
+  const handleBack = () => {
+    navigate('/');
+  };
+
+  const handleCreateEventClick = () => {
+    setSelectedDate(undefined);
+    setShowCreateModal(true);
+  };
+
+  const handleDateClicked = (date: Date) => {
+    setSelectedDate(date);
+    setShowCreateModal(true);
+  };
+
+  const handleEventClick = (event: EventType) => {
+    setSelectedEvent(event);
+    setShowEventsDetailsModal(true);
+  };
+
+  const handleCreateEventSubmit = async (eventData: CreateEventDTO) => {
+    createEvent(eventData);
+  };
 
   if (loading) {
     return (
@@ -31,34 +78,35 @@ export const CalendarView = () => {
   if (!calendar) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-red-600">{error}</div>
+        <div className="text-red-600">{calendarError}</div>
       </div>
     )
-  }
-
-  const handleDateClick = (arg: any) => {
-    console.log('Date clicked: ', arg.dateStr);
-  }
-
-  // const handleEventClick = (arg: any) => {
-  //   console.log('Event clicked: ', arg.event.id);
-  // }
-
-  const handleBack = () => {
-    navigate('home');
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <CalendarHeader
         calendar={calendar}
+        onCreateEvent={handleCreateEventClick}
         onBack={handleBack}
       ></CalendarHeader>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"></main>
         <FullCalendarComponent
           ref={calendarRef}
-          onDateClick={handleDateClick}
+          events={events}
+          onDateClick={handleDateClicked}
         ></FullCalendarComponent>
+
+        {/* Create Event Modal */}
+        <CreateEventModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSubmit={handleCreateEventSubmit}
+          calendarId={calendarId}
+          selectedDate={selectedDate}
+          isCreating={isCreating}
+          error={createError}
+        ></CreateEventModal>
     </div>
   );
 };

@@ -46,6 +46,12 @@ export class EventController {
       const userId = request.user?.sub;
       const { calendarId, title, startTime, endTime, description } = request.body;
 
+      console.log('calendarId: ', calendarId);
+      console.log('title: ', title);
+      console.log('startTime: ', startTime);
+      console.log('End time: ', endTime);
+      console.log('start time type: ', typeof(startTime));
+
       if (!calendarId || !title || !startTime || !endTime) {
         return reply.status(400).send({
           message: 'Required fields: calendarId, title, startTime, endTime'

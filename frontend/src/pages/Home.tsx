@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2} from "lucide-react";
 
 import { useCalendars } from "../hooks/useCalendars";
+import { useCreateCalendar } from "../hooks/useCreateCalendar";
 import { authService } from "../services/authService";
 import { DashboardHeader } from "../components/dashboard/DashboardHeader";
 import { PageHeader } from "../components/dashboard/PageHeader";
@@ -14,26 +14,26 @@ import type { CreateCalendarDTO } from "../types/calendar";
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
-  const { calendars, loading, error, loadCalendars, createCalendar } = useCalendars();
+  const { calendars, loading, error, refetch } = useCalendars();
+  const { createCalendar, isCreating, error: createError} = useCreateCalendar(async () => {
+    setShowCreateModal(false);
+    setNewCalendar({name: '', description: ''});
+    await refetch();
+  })
   const [newCalendar, setNewCalendar] = useState<CreateCalendarDTO>({ name: '', description: '' });
-  const [creating, setCreating] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const navigate = useNavigate();
 
   const handleCreateCalendar = async () => {
     if (!newCalendar.name.trim()) return;
-    setCreating(true);
 
     try {
       await createCalendar(newCalendar);
-      setShowCreateModal(false);
-      setNewCalendar({ name: "", description: "" });
       navigate('/');
     } catch(error) {
       // error is handled by the hook
     } finally {
-      setCreating(false);
     }
   };
 
@@ -61,7 +61,7 @@ export default function Home() {
           onSubmit={handleCreateCalendar}
           calendar={newCalendar}
           onChange={setNewCalendar}
-          isCreating={creating}
+          isCreating={isCreating}
           error={null}
         />
       )}
