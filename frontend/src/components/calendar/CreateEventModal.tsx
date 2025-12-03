@@ -1,7 +1,11 @@
 import type React from "react";
-import type { CreateEventDTO } from "../../types/event.types";
+import type { CreateEventDTO, EventFormData } from "../../types/event.types";
 import { useState, useEffect } from "react";
 import { X, Clock, Loader2, Calendar } from "lucide-react";
+import { ErrorAlert } from "./shared/ErrorAlert";
+import { ModalWrapper } from "./shared/ModalWrapper";
+import { EventFormFields } from "./shared/EventFormsField";
+import { validateEventTimes } from "../../utils/eventHelpers";
 
 interface CreateEventModalProps {
   isOpen: boolean;
@@ -41,7 +45,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     };
   };
 
-  const [formData, setFormData] = useState(() => {
+  const [formData, setFormData] = useState<EventFormData>(() => {
     const {start, end} = getDefaultTimes();
     return {
       title: '',
@@ -50,6 +54,8 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
       end: end
     };
   });
+
+  const [validationError, setValidationError] = useState<string | null>();
 
   // Update times when selectedDate data changes
   useEffect(() => {
@@ -77,9 +83,14 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
   if (!isOpen) return null;
 
+  const timeError = validateEventTimes(formData.start, formData.end);
+  if (timeError) {
+    setValidationError(timeError);
+    return;
+  }
+
   const handleSubmit = async () => {
     if (!formData.title.trim()) return;
-
     try {
       await onSubmit({
         title: formData.title,
@@ -96,17 +107,6 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     }
   };
 
-  // Validate dates
-  const start = new Date(formData.start);
-  const end = new Date(formData.end);
-
-  // if (start > end) {
-  //   alert('End time msut be after start time');
-  //   return;
-  // }
-
-
-
   const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -115,126 +115,42 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-900">Create Event</h3>
-          <button
-            onClick={onClose}
-            disabled={isCreating}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+    <ModalWrapper isOpen={isOpen} onClose={onClose} title="Create Event" maxWidth="md">
+      <EventFormFields
+        formData={formData}
+        onChange={handleChange}
+        disabled={isCreating}
+      />
 
-        <div className="space-y-4">
-          {/* Title */}
-          <div>
-            <label htmlFor="event-title" className="block text-sm font-medium text-gray-700 mb-2">
-              Event Title *
-            </label>
-            <input
-              id="event-title"
-              type="text"
-              value={formData.title}
-              onChange={(e) => handleChange('title', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Team Meeting"
-              disabled={isCreating}
-              autoFocus
-            />
-          </div>
+      <ErrorAlert message={validationError || error} />
 
-          {/* Description */}
-          <div>
-            <label htmlFor="event-description" className="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea
-              id="event-description"
-              value={formData.description}
-              onChange={(e) => handleChange('description', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-              rows={3}
-              placeholder="Discuss Q4 goals and strategy..."
-              disabled={isCreating}
-            />
-          </div>
-
-          {/* Start Time */}
-          <div>
-            <label htmlFor="event-start" className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-2" />
-                Start Time *
-              </div>
-            </label>
-            <input
-              id="event-start"
-              type="datetime-local"
-              value={formData.start}
-              onChange={(e) => handleChange('start', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              disabled={isCreating}
-            />
-          </div>
-
-          {/* End Time */}
-          <div>
-            <label htmlFor="event-end" className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-2" />
-                End Time *
-              </div>
-            </label>
-            <input
-              id="event-end"
-              type="datetime-local"
-              value={formData.end}
-              onChange={(e) => handleChange('end', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              disabled={isCreating}
-            />
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-800 text-sm rounded-lg">
-              {error}
-            </div>
+      {/* Action Buttons */}
+      <div className="flex space-x-3 mt-6">
+        <button
+          onClick={onClose}
+          disabled={isCreating}
+          className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={isCreating || !formData.title.trim()}
+          className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+        >
+          {isCreating ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              Creating...
+            </>
+          ) : (
+            <>
+              <Calendar className="w-4 h-4 mr-2" />
+              Create Event
+            </>
           )}
-
-          {/* Action Buttons */}
-          <div className="flex space-x-3 mt-6">
-            <button
-              onClick={onClose}
-              disabled={isCreating}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={isCreating || !formData.title.trim()}
-              className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {isCreating ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Create Event
-                </>
-              )}
-            </button>
-          </div>
-        </div>
+        </button>
       </div>
-    </div>
-  );
-  
+    </ModalWrapper>
+  )
 }
