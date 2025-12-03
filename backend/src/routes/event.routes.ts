@@ -10,9 +10,9 @@ export const eventRoutes = async(fastify: FastifyInstance) => {
    * Get a specific event by its id
    */
   fastify.get(
-    '/:id',
+    '/:eventId',
     { onRequest: [fastify.authenticate] },
-    (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) =>
+    (request: FastifyRequest<{ Params: { eventId: string } }>, reply: FastifyReply) =>
       eventController.getEventById(request, reply)
   )
 
@@ -22,7 +22,7 @@ export const eventRoutes = async(fastify: FastifyInstance) => {
 
   fastify.post(
     '/create',
-    { onRequest: [fastify.authenticate ] },
+    { onRequest: [fastify.authenticate] },
     (request: FastifyRequest<{
       Body: {
         calendarId: string;
@@ -32,5 +32,17 @@ export const eventRoutes = async(fastify: FastifyInstance) => {
         description?: string;
       };
     }>, reply: FastifyReply) => eventController.createEvent(request, reply)
+  )
+
+  /**
+   * Delete an event by ID
+   */
+
+  fastify.delete(
+    '/:eventId',
+    { onRequest: [fastify.authenticate] },
+    (request: FastifyRequest<{ Params: { eventId: string } }>, reply: FastifyReply) => {
+      eventController.deleteEvent(request, reply);
+    }
   )
 }

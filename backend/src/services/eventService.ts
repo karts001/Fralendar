@@ -23,14 +23,25 @@ export class EventService {
   }
 
   async verifyAccessByEventId(userId: string, eventId: string) {
-    const event = this.prisma.event.findUnique({
-      where: {
-        id: eventId,
-      }
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+      include: { calendar: true }
     });
 
     if (!event) {
-      throw new Error('User is not a member of this calendar');
+      throw new Error('Event not found');
+    }
+
+    const hasAccess = event.calendar.adminId === userId ||
+      await this.prisma.calendarMember.findFirst({
+        where: {
+          calendarId: event.calendarId,
+          userId
+        }
+      });
+
+    if (!hasAccess) {
+      throw new Error('Access denied');
     }
 
     return event;
@@ -107,6 +118,28 @@ export class EventService {
     });
 
     return EventMapper.toDTO(event);
+  }
 
+  async deleteEvent(userId: string, eventId: string) {
+    const event = this.prisma.event.findUnique({
+      where: { id: eventId },
+      include: { calendar: true}
+    });
+
+    // Check permissions
+    const canDelete = event.calendar.adminId === userId || event.createdById === userId;
+
+    if (!canDelete) {
+      throw new Error('Only the event creator or calendar admin can delete an event');
+    }
+
+    await this.prisma.event.delete({
+      where: { id: eventId }
+    });
+
+    return {
+      success: true,
+      message: 'Event deleted successfully'
+    };
   }
 }

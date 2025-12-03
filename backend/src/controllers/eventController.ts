@@ -9,10 +9,11 @@ export class EventController {
       const { eventId } = request.params as { eventId: string };
       const userId = request.user.sub;
 
-      const events = await this.eventService.getEventById(userId, eventId);
+      const event = await this.eventService.getEventById(userId, eventId);
 
-      if (events.length > 0) {
+      if (event) {
         return reply.status(200).send({
+          event,
           success: true,
           message: `Retrieved event with event ID: ${eventId}`
         });
@@ -23,9 +24,9 @@ export class EventController {
         });
       }
     } catch(error) {
-      console.error('Error retrieving events: ', error);
+      console.error('Error retrieving event: ', error);
       return reply.status(500).send({
-        message: `Failed to retrieve calendar events`
+        message: `Failed to retrieve event`
       });
     }
   }
@@ -75,6 +76,22 @@ export class EventController {
       console.error('Error creating event: ', error);
       return reply.status(500).send({
         message: 'Failed to create event'
+      });
+    }
+  }
+
+  async deleteEvent(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const userId = request.user?.sub;
+      const { eventId } = request.params as { eventId: string};
+
+      const result = await this.eventService.deleteEvent(userId, eventId);
+
+      return reply.status(200).send({result});
+    } catch(error) {
+      console.error('Error deleting event: ', error);
+      return reply.status(500).send({
+        message: error instanceof Error ? error.message : 'Failed to delete event'
       });
     }
   }

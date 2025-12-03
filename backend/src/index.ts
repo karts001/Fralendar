@@ -19,7 +19,7 @@ app.register(authPlugin);
 
 app.register(authRoutes, { prefix: '/auth' });
 app.register(calendarRoutes, { prefix: '/calendars' });
-app.register(eventRoutes, { prefix: '/event' });
+app.register(eventRoutes, { prefix: '/events' });
 
 
 app.listen({ port: 4000 }, (err, address) => {
