@@ -45,14 +45,6 @@ export class EventService {
     }
 
     return event;
-  }  
-
-  async getEventById(userId: string, eventId: string) {
-      const event = await this.verifyAccessByEventId(userId, eventId);
-      if (!event) {
-        throw new Error(`Event with ID: ${eventId} not found`);
-      }
-      return event;
   }
   
   async createEvent(
@@ -121,13 +113,24 @@ export class EventService {
   }
 
   async deleteEvent(userId: string, eventId: string) {
-    const event = this.prisma.event.findUnique({
+    const event = await this.prisma.event.findUnique({
       where: { id: eventId },
-      include: { calendar: true}
+      include: { 
+        calendar: {
+          select: {
+            adminId: true
+          }
+        },
+      }
     });
 
+    console.log(event);
+
+    console.log('User ID: ', userId);
+    console.log('Calendar admin ID: ', event.calendar.adminId);
+    console.log('Event creator ID: ', event.createdById);
     // Check permissions
-    const canDelete = event.calendar.adminId === userId || event.createdById === userId;
+    const canDelete = (event.calendar.adminId === userId) || (event.createdById === userId);
 
     if (!canDelete) {
       throw new Error('Only the event creator or calendar admin can delete an event');

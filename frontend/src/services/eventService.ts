@@ -23,7 +23,7 @@ export const eventService = {
 
   async createEvent(input: CreateEventDTO): Promise<EventType> {
     const response = await authService.authenticatedFetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}/event/create`, 
+      `${import.meta.env.VITE_BACKEND_API_URL}/events/create`, 
       {
         method: 'POST',
         headers: {
@@ -33,7 +33,6 @@ export const eventService = {
       }
     );
     
-
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to create event');
@@ -41,5 +40,19 @@ export const eventService = {
 
     const data = await response.json();
     return data.event;
+  },
+
+  async deleteEvent(eventId: string): Promise<void> {
+    const response = await authService.authenticatedFetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/events/${eventId}`, 
+      { method: 'DELETE' }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to delete event');
+    }
+
+    await response.json();
   }
 }

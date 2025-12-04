@@ -5,16 +5,6 @@ import { EventController } from '../controllers/eventController';
 export const eventRoutes = async(fastify: FastifyInstance) => {
   const eventService = new EventService(fastify.prisma);
   const eventController = new EventController(eventService);
-  
-  /**
-   * Get a specific event by its id
-   */
-  fastify.get(
-    '/:eventId',
-    { onRequest: [fastify.authenticate] },
-    (request: FastifyRequest<{ Params: { eventId: string } }>, reply: FastifyReply) =>
-      eventController.getEventById(request, reply)
-  )
 
   /**
    * Create an event
