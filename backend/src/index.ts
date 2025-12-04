@@ -13,7 +13,10 @@ const app: FastifyInstance = Fastify({
     level: 'debug'
   }});
 
-app.register(cors, { origin: true });
+app.register(cors, { 
+  origin: true,
+  methods: ['GET', 'HEAD', 'POST', 'DELETE', 'UPDATE']
+});
 app.register(prismaPlugin);
 app.register(authPlugin);
 
