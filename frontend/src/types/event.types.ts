@@ -18,6 +18,7 @@ export interface EventAttendee {
   userId: string;
   status?: string;
   respondedAt: Date;
+  user: User;
 }
 
 export interface CreateEventDTO {
