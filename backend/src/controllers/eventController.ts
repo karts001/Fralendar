@@ -4,33 +4,6 @@ import { EventService } from "../services/eventService";
 export class EventController {
   constructor(private eventService: EventService) {}
 
-  async getEventById(request: FastifyRequest, reply: FastifyReply) {
-    try {
-      const { eventId } = request.params as { eventId: string };
-      const userId = request.user.sub;
-
-      const event = await this.eventService.getEventById(userId, eventId);
-
-      if (event) {
-        return reply.status(200).send({
-          event,
-          success: true,
-          message: `Retrieved event with event ID: ${eventId}`
-        });
-      } else {
-        return reply.status(200).send({
-          success: false,
-          message: 'No events were found'
-        });
-      }
-    } catch(error) {
-      console.error('Error retrieving event: ', error);
-      return reply.status(500).send({
-        message: `Failed to retrieve event`
-      });
-    }
-  }
-
   async createEvent(
     request: FastifyRequest<{
       Body: {
