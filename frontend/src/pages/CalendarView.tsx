@@ -8,10 +8,10 @@ import { useCreateEvents } from '../hooks/useCreateEvent';
 import { useCalendarEvents } from '../hooks/useCalendarEvents';
 import type { CreateEventDTO, EventType } from '../types/event.types';
 import { CreateEventModal } from '../components/calendar/CreateEventModal';
+import { EventDetailsModal } from '../components/calendar/EventDetailsModal';
 
 export const CalendarView = () => {
-  const { calendarId } = useParams<{ calendarId: string }>();
-  
+  const { calendarId } = useParams<{ calendarId: string }>();  
   const calendarRef = useRef(null);
 
   if (!calendarId) {
@@ -53,7 +53,7 @@ export const CalendarView = () => {
     setShowCreateModal(true);
   };
 
-  const handleDateClicked = (date: Date) => {
+  const handleDateClick = (date: Date) => {
     setSelectedDate(date);
     setShowCreateModal(true);
   };
@@ -65,7 +65,14 @@ export const CalendarView = () => {
 
   const handleCreateEventSubmit = async (eventData: CreateEventDTO) => {
     createEvent(eventData);
+    refetch();
   };
+
+  const handleEventDelete = async () => {
+    setShowEventsDetailsModal(false);
+    setSelectedEvent(null);
+    refetch();
+  }
 
   if (loading) {
     return (
@@ -94,7 +101,9 @@ export const CalendarView = () => {
         <FullCalendarComponent
           ref={calendarRef}
           events={events}
-          onDateClick={handleDateClicked}
+          onDateClick={handleDateClick}
+          onEventClick={handleEventClick}
+
         ></FullCalendarComponent>
 
         {/* Create Event Modal */}
@@ -107,6 +116,16 @@ export const CalendarView = () => {
           isCreating={isCreating}
           error={createError}
         ></CreateEventModal>
+
+        {/* Event details Modal */}
+        {selectedEvent && (
+          <EventDetailsModal
+            isOpen={showEventDetailsModal}
+            event={selectedEvent}
+            onClose={() => setShowEventsDetailsModal(false)}
+            onDelete={handleEventDelete}
+          />
+        )}
     </div>
   );
 };

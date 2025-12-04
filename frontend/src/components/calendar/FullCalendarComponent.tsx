@@ -16,18 +16,40 @@ interface FullCalendarComponentProps {
   ref: React.RefObject<any>;
   events: EventType[];
   onDateClick: (arg: any) => void;
-  // onEventClick: (arg: any) => void;
+  onEventClick: (event: EventType) => void;
+  onEventDelete?: (eventId: string) => void;
 }
 
 export const FullCalendarComponent: React.FC<FullCalendarComponentProps> = (
   {
+    events,
     onDateClick,
-    events
+    onEventClick,
+    onEventDelete,
   }) => {
   const calendarRef = useRef<FullCalendar>(null);
   
   const handleDateClick = (arg:any) => {
-    onDateClick(arg.dateStr);
+    const date = new Date(arg.dateStr);
+    onDateClick(date);
+  }
+
+  const handleEventClick = (info: any) => {
+    const eventId = info.event.id;
+    const originalEvent = events.find(e => e.id === eventId);
+
+    if (originalEvent) {
+      onEventClick(originalEvent);
+    } else {
+      console.error('Error event not found');
+    }
+  }
+
+  const handleEventDelete = (info: any) => {
+    if (onEventDelete) {
+      const eventId = info.event.id;
+      onEventDelete(eventId);
+    }
   }
   // Transform EventType into FullCalendar format
   const fullCalendarEvents = events.map(event => ({
@@ -55,6 +77,8 @@ export const FullCalendarComponent: React.FC<FullCalendarComponentProps> = (
           right: 'dayGridMonth,timeGridWeek,timeGridDay'
         }}
         events={fullCalendarEvents}
+        eventClick={handleEventClick}
+        eventRemove={handleEventDelete}
         editable={true}
         selectable={true}
         selectMirror={true}
