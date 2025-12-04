@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { CalendarDetailsDTO, CalendarDTO } from "../dtos/calendarDTO";
 import { CalendarDetailsMapper, CalendarMapper } from "../mappers/calendarMapper";
+import { EventDTO } from "../dtos/eventDTO";
+import { EventMapper } from "../mappers/eventMapper";
 
 export class CalendarService {
   constructor(private prisma: PrismaClient) {}
@@ -53,14 +55,29 @@ export class CalendarService {
     return calendars.map(c => CalendarMapper.toDTO(c));
   }
 
-  async getCalendarEvents(userId: string, calendarId: string) {
+  async getCalendarEvents(userId: string, calendarId: string): Promise<EventDTO[]> {
     // First verify member has access to this calendar
     await this.verifyAccessByCalendarId(userId, calendarId);
 
-    return await this.prisma.event.findMany({
+    const events = await this.prisma.event.findMany({
       where: { calendarId },
+      include: {
+        createdBy: {
+          select: { id: true, email: true, displayName: true }
+        },
+        attendees: {
+          include: {
+            user: {
+              select: { id: true, email: true, displayName: true}
+            }
+          }
+        }
+      },
+
       orderBy: { startTime: 'asc' }
     });
+
+    return events.map(c => EventMapper.toDTO(c));
   }
 
   async getCalendarDetails(calendarId: string): Promise<CalendarDetailsDTO> {
