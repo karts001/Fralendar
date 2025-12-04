@@ -6,7 +6,7 @@ export interface EventType {
   title: string;
   startTime: Date;
   endTime: Date;
-  description?: string | null;
+  description?: string | undefined;
   createdById: string;
   createdBy: User
   attendees: EventAttendee[]
@@ -27,4 +27,11 @@ export interface CreateEventDTO {
   startTime: string;
   endTime: string;
   calendarId: string;
+}
+
+export interface EventFormData {
+  title: string;
+  description?: string;
+  start: string;
+  end: string;
 }

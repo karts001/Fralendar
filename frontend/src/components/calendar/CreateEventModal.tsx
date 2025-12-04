@@ -1,11 +1,11 @@
 import type React from "react";
 import type { CreateEventDTO, EventFormData } from "../../types/event.types";
 import { useState, useEffect } from "react";
-import { X, Clock, Loader2, Calendar } from "lucide-react";
+import { Loader2, Calendar } from "lucide-react";
 import { ErrorAlert } from "./shared/ErrorAlert";
 import { ModalWrapper } from "./shared/ModalWrapper";
 import { EventFormFields } from "./shared/EventFormsField";
-import { validateEventTimes } from "../../utils/eventHelpers";
+import { getDefaultEventTimes, validateEventTimes } from "../../utils/eventHelpers";
 
 interface CreateEventModalProps {
   isOpen: boolean;
@@ -26,27 +26,9 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
   isCreating,
   error
 }) => {
-  // Get default times
-  const getDefaultTimes = () => {
-    const base = selectedDate ? new Date(selectedDate.getTime()): new Date();
-
-    const start = new Date(base);
-
-    // Round to next hour
-    start.setMinutes(0, 0, 0);
-    start.setHours(start.getHours() + 1);
-
-    const end = new Date(start);
-    end.setHours(end.getHours() + 1);
-
-    return {
-      start: start.toISOString().slice(0,16),
-      end: end.toISOString().slice(0,16)
-    };
-  };
 
   const [formData, setFormData] = useState<EventFormData>(() => {
-    const {start, end} = getDefaultTimes();
+    const {start, end} = getDefaultEventTimes(selectedDate);
     return {
       title: '',
       description: '',
@@ -60,7 +42,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
   // Update times when selectedDate data changes
   useEffect(() => {
     if (selectedDate) {
-      const {start, end} = getDefaultTimes();
+      const {start, end} = getDefaultEventTimes();
       setFormData(prev => ({
         ...prev,
         start,
@@ -71,7 +53,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) {
-      const {start, end} = getDefaultTimes();
+      const {start, end} = getDefaultEventTimes();
       setFormData({
         title: '',
         description: '',
