@@ -17,7 +17,7 @@ const authPlugin: FastifyPluginAsync = fp(async (fastify) => {
   // Register JWT plugin in "verify-only" mode with dynamic secret
   fastify.register(jwt, {
     decode: { complete: true },
-    secret: async (request, token) => {
+    secret: async (request: any, token: any) => {
       try {
         const { header, payload } = token as {
           header: { kid?: string; alg?: string};
