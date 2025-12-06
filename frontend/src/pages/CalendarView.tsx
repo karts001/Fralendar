@@ -24,7 +24,7 @@ export const CalendarView = () => {
   const navigate = useNavigate();
   
   const { calendar, error: calendarError, loading: calendarLoading  } = useCalendarDetails(calendarId);
-  const { events, loading: eventsLoading, error: eventsError, refetch} = useCalendarEvents(calendarId);
+  const { events, loading: eventsLoading, refetch} = useCalendarEvents(calendarId);
 
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);

@@ -10,8 +10,8 @@ import { supabase } from './lib/supabaseClient';
 import { CalendarView } from './pages/CalendarView';
 
 function App() {
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [_session, setSession] = useState<any>(null);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {

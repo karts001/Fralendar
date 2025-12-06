@@ -13,9 +13,9 @@ import type { CreateCalendarDTO } from "../types/calendar";
 
 
 export default function Home() {
-  const [user, setUser] = useState<any>(null);
-  const { calendars, loading, error, refetch } = useCalendars();
-  const { createCalendar, isCreating, error: createError} = useCreateCalendar(async () => {
+  const [user, _setUser] = useState<any>(null);
+  const { calendars, error, refetch } = useCalendars();
+  const { createCalendar, isCreating} = useCreateCalendar(async () => {
     setShowCreateModal(false);
     setNewCalendar({name: '', description: ''});
     await refetch();

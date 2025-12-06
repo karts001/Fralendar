@@ -54,7 +54,7 @@ export default function Login() {
 
       // Use React Router navigation
       navigate('/');
-    } catch (error) {
+    } catch (error: any) {
       setMessage({ type: 'error', text: error.message });
       console.error('Login error:', error);
     } finally {
