@@ -8,6 +8,10 @@ ENV NODE_ENV=production
 COPY package.json package-lock.json tsconfig.json ./
 RUN npm ci --also=dev
 
+# Define ENV variables
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 # Copy Prisma schemas
 COPY prisma ./prisma
 
