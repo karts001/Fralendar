@@ -8,8 +8,14 @@ ENV NODE_ENV=production
 COPY package.json package-lock.json tsconfig.json ./
 RUN npm ci --also=dev
 
+# Copy Prisma schemas
+COPY prisma ./prisma
+
 # Copy source code
 COPY src ./src
+
+# Generate Prisma Client
+RUN npx prisma generate
 
 # Build
 RUN npm run build
@@ -30,4 +36,4 @@ USER node
 
 EXPOSE 3000
 
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "npm run start"]
