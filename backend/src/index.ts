@@ -25,7 +25,7 @@ app.register(calendarRoutes, { prefix: '/calendars' });
 app.register(eventRoutes, { prefix: '/events' });
 
 
-app.listen({ port: 4000 }, (err, address) => {
+app.listen({ port: 3000, host: '0.0.0.0' }, (err, address) => {
   if (err) throw err;
   console.log(`🚀 server running at ${address}`);
 });
