@@ -11,10 +11,6 @@ RUN echo "🚀 Force rebuild"
 COPY package.json package-lock.json tsconfig.json ./
 RUN npm ci --also=dev
 
-# Define ENV variables
-ARG DATABASE_URL
-ENV DATABASE_URL="$DATABASE_URL"
-
 # Copy Prisma schemas
 COPY prisma ./prisma
 
@@ -39,13 +35,10 @@ COPY --from=builder /app/node_modules node_modules
 COPY --from=builder /app/dist dist/
 COPY --from=builder /app/prisma prisma/
 
-# Add DATABASE_URL from Railway service variables
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
-
 # Run as non root user for security
 USER node
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npm run start"]
+# Run Prisma operations at *runtime* so DB URL exists
+CMD ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && node dist/index.js"]
