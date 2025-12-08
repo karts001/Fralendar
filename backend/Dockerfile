@@ -29,6 +29,11 @@ RUN npm prune --production
 # Stage 2: Production
 FROM node:22-slim
 
+# Install OpenSSL (CRITICAL: Prisma requires this)
+RUN apt-get update -y && \
+    apt-get install -y openssl && \
+    rm -rf /var/lib/apt/lists/*
+
 # Swap to node user for security
 USER node
 
