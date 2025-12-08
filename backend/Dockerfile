@@ -28,18 +28,18 @@ RUN npm prune --production
 
 # Stage 2: Production
 FROM node:22-slim
-WORKDIR /app
 
-COPY --from=builder /app/package.json package.json
-COPY --from=builder /app/node_modules node_modules
-COPY --from=builder /app/dist dist/
-COPY --from=builder /app/prisma prisma/
-
-# Change ownership of files in app folder to node user
-RUN chown -R node:node /app
-
-# Run as non root user for security
+# Swap to node user for security
 USER node
+
+# Set working directory to inside node home fodler to avoid ownership issues
+WORKDIR /home/node/app
+
+# Copy build files
+COPY --from=builder --chown=node:node /app/package.json package.json
+COPY --from=builder --chown=node:node /app/node_modules node_modules
+COPY --from=builder --chown=node:node /app/dist dist/
+COPY --from=builder --chown=node:node /app/prisma prisma/
 
 EXPOSE 3000
 
