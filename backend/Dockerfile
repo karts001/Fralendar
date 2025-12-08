@@ -35,6 +35,9 @@ COPY --from=builder /app/node_modules node_modules
 COPY --from=builder /app/dist dist/
 COPY --from=builder /app/prisma prisma/
 
+# Change ownership of files in app folder to node user
+RUN chown -R node:node /app
+
 # Run as non root user for security
 USER node
 
